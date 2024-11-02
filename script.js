@@ -183,3 +183,93 @@ const headerObserver = new IntersectionObserver(stickyNav, {
 });
 
 headerObserver.observe(header);
+
+
+//Reveal Sections 
+
+const allSection = document.querySelectorAll('.section')
+const revealSection = function (entries, observer) {
+  const [entry] = entries
+  if (!entry.isIntersecting)
+    return;
+  entry.target.classList.remove('section--hidden')
+  observer.unobserve(entry.target)
+};
+
+const sectionObserver = new IntersectionObserver(revealSection, {
+  root: null,
+  threshold: 0.15,
+});
+allSection.forEach(function (section) {
+  sectionObserver.observe(section)
+  section.classList.add('section--hidden')
+});
+
+
+//LAZY LOADING IMAGE//
+
+const imgTarget = document.querySelectorAll('img[data-src');
+
+const loadImg = function (entries, observer) {
+  const [entry] = entries;
+  if (!entry.isIntersecting)
+    return;
+  //const imgSrc=entry.target.getAttribute('data-src');
+  //Better use entry.target.dataset.src
+
+  entry.target.src = entry.target.dataset.src;
+
+  entry.target.addEventListener('load', function () {
+    entry.target.classList.remove('lazy-img')
+  })
+  observer.unobserve(entry.target)
+};
+const imgObserver = new IntersectionObserver(loadImg, {
+  root: null,
+  threshold: 0,
+  rootMargin: '200px',
+})
+
+imgTarget.forEach(img => imgObserver.observe(img));
+
+//TESTIMONIAL SLIDER////
+
+const slides = document.querySelectorAll('.slide');
+const btnLeft = document.querySelector('.slider__btn--left');
+const btnRight = document.querySelector('.slider__btn--right');
+
+let currSlide = 0;
+const maxSlides = slides.length;
+
+const goToSlide = function (slide) {
+  slides.forEach((s, i) => (s.style.transform = `translateX(${100 * (i - currSlide)}%)`)
+  );
+
+};
+goToSlide(0);
+
+//Next Slide
+const nextSlide = function () {
+  if (currSlide === maxSlides - 1) {
+    currSlide = 0;
+  } else {
+    currSlide++;
+  }
+  goToSlide(currSlide)
+}
+
+//Previous Slide
+
+const prevSlide = function () {
+
+  if (currSlide === 0) {
+    currSlide = maxSlides - 1;
+  } else {
+    currSlide--;
+  }
+  goToSlide(currSlide);
+}
+
+btnRight.addEventListener('click', nextSlide);
+btnLeft.addEventListener('click', prevSlide);
+
